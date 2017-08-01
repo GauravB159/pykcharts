@@ -18,7 +18,7 @@ function Layer(props) {
   const layerClass = classNames('recharts-layer', className);
 
   return (
-    <g className={layerClass} {...others}>
+    <g className={layerClass} id={props.id} {...others}>
       {children}
     </g>
   );

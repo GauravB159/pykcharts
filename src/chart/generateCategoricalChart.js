@@ -84,6 +84,7 @@ const generateCategoricalChart = ({
       stackOffset: 'none',
       barCategoryGap: '10%',
       barGap: 4,
+      horizontal: false,
       margin: { top: 5, right: 5, bottom: 5, left: 5 },
       ...defaultProps,
     };
@@ -129,7 +130,6 @@ const generateCategoricalChart = ({
       if (item && item.props) {
         return item.props.data || [];
       }
-
       return graphicalItems.reduce((result, child) => {
         const itemData = child.props.data;
 
@@ -568,7 +568,6 @@ const generateCategoricalChart = ({
           barGap, barCategoryGap, bandSize, sizeList: sizeList[cateAxisId], maxBarSize,
         });
         const componsedFn = item && item.type && item.type.getComposedData;
-
         if (componsedFn) {
           formatedItems.push({
             props: {
@@ -1365,7 +1364,6 @@ const generateCategoricalChart = ({
     renderGraphicChild = (element, displayName, index) => {
       const item = this.filterFormatItem(element, displayName, index);
       if (!item) { return null; }
-
       const graphicalItem = cloneElement(element, item.props);
       const { isTooltipActive, activeTooltipIndex } = this.state;
       const { children } = this.props;
@@ -1395,8 +1393,15 @@ const generateCategoricalChart = ({
 
     render() {
       if (!validateWidthHeight(this)) { return null; }
-
-      const { children, className, width, height, style, compact, ...others } = this.props;
+      
+      const { children, className, width, height, style, compact, horizontal, data, stack, ...others } = this.props;
+      // if(stack === true){
+      //   data = arr.reduce(function(acc, cur, i) {
+      //     acc[i] = cur;
+      //     return acc;
+      //   }, {});
+      //   data["name"]="Data";
+      // }
       const attrs = getPresentationAttributes(others);
       const map = {
         CartesianGrid: { handler: this.renderGrid, once: true },
@@ -1429,7 +1434,6 @@ const generateCategoricalChart = ({
           </Surface>
         );
       }
-
       const events = this.parseEventsOfWrapper();
       return (
         <div
@@ -1438,7 +1442,7 @@ const generateCategoricalChart = ({
           {...events}
           ref={(node) => { this.container = node; }}
         >
-          <Surface {...attrs} width={width} height={height}>
+          <Surface {...attrs} width={width} height={height} horizontal={horizontal}>
             {
               renderByOrder(children, map)
             }

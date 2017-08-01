@@ -23,7 +23,7 @@ const propTypes = {
   ]),
 };
 function Surface(props) {
-  const { children, width, height, viewBox, className, style, ...others } = props;
+  const { children, width, height, viewBox, className, style,horizontal, ...others } = props;
   const svgView = viewBox || { width, height, x: 0, y: 0 };
   const layerClass = classNames('recharts-surface', className);
   const attrs = getPresentationAttributes(others);
@@ -37,6 +37,7 @@ function Surface(props) {
       style={style}
       viewBox={`${svgView.x} ${svgView.y} ${svgView.width} ${svgView.height}`}
       version="1.1"
+      transform = {horizontal === true ? "translate(-" + svgView.height*1.5 + " -" + 0.25*svgView.height + ") rotate(90 " + svgView.height  + " " + svgView.height + ") " : null}
     >
       {children}
     </svg>

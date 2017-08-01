@@ -93,17 +93,14 @@ class Bar extends Component {
     xAxisTicks, yAxisTicks, stackedData, dataStartIndex, displayedData, offset }) => {
     const pos = findPositionOfBar(barPosition, item);
     if (!pos) { return []; }
-
     const { layout } = props;
     const { dataKey, children, minPointSize } = item.props;
     const numericAxis = layout === 'horizontal' ? yAxis : xAxis;
     const stackedDomain = stackedData ? numericAxis.scale.domain() : null;
     const baseValue = getBaseValueOfBar({ props, numericAxis });
     const cells = findAllByType(children, Cell);
-
     const rects = displayedData.map((entry, index) => {
       let value, x, y, width, height;
-
       if (stackedData) {
         value = truncateByDomain(stackedData[dataStartIndex + index], stackedDomain);
       } else {
@@ -153,7 +150,6 @@ class Bar extends Component {
           width += delta;
         }
       }
-
       return {
         ...entry,
         x, y, width, height, value: stackedData ? value : value[1],
@@ -208,12 +204,11 @@ class Bar extends Component {
   renderRectanglesStatically(data) {
     const { shape } = this.props;
     const baseProps = getPresentationAttributes(this.props);
-
     return data && data.map((entry, i) => {
       const props = { ...baseProps, ...entry, index: i };
 
       return (
-        <Layer
+        <Layer id={this.props.dataKey}
           className="recharts-bar-rectangle"
           {...filterEventsOfChild(this.props, entry, i)}
           key={`rectangle-${i}`}
@@ -264,7 +259,6 @@ class Bar extends Component {
               if (layout === 'horizontal') {
                 const interpolator = interpolateNumber(0, entry.height);
                 const h = interpolator(t);
-
                 return { ...entry, y: entry.y + entry.height - h, height: h };
               }
 
@@ -275,7 +269,7 @@ class Bar extends Component {
             });
 
             return (
-              <Layer>
+              <Layer id={this.props.dataKey}>
                 {this.renderRectanglesStatically(stepData)}
               </Layer>
             );
@@ -330,11 +324,9 @@ class Bar extends Component {
     const { hide, data, className, xAxis, yAxis, left, top,
       width, height, isAnimationActive } = this.props;
     if (hide || !data || !data.length) { return null; }
-
     const { isAnimationFinished } = this.state;
     const layerClass = classNames('recharts-bar', className);
     const needClip = (xAxis && xAxis.allowDataOverflow) || (yAxis && yAxis.allowDataOverflow);
-
     return (
       <Layer className={layerClass}>
         {needClip ? (
@@ -345,7 +337,7 @@ class Bar extends Component {
           </defs>
         ) : null}
         <Layer
-          className="recharts-bar-rectangles"
+          className="recharts-bar-rectangles" 
           clipPath={needClip ? `url(#clipPath-${this.id})` : null}
         >
           {this.renderRectangles()}

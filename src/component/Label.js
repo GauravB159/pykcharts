@@ -274,7 +274,7 @@ const getAttrsOfCartesianLabel = (props) => {
 const isPolar = viewBox => isNumber(viewBox.cx);
 
 function Label(props) {
-  const { viewBox, position, value, children, content } = props;
+  const { viewBox, position, value, children, content,perc,horizontal } = props;
 
   if (!viewBox || (_.isNil(value) && _.isNil(children) &&
     !isValidElement(content) && !_.isFunction(content))) { return null; }
@@ -294,13 +294,16 @@ function Label(props) {
   const positionAttrs = isPolarLabel ?
     getAttrsOfPolarLabel(props) :
     getAttrsOfCartesianLabel(props);
-
+  let percent = '';
+  if(perc === true)
+    percent="%";
   return (
     <Text
       className="recharts-label"
       {...attrs}
       {...positionAttrs}
-    >{label}</Text>
+      transform = {horizontal === true ? "rotate(-90 "+ positionAttrs.x + " " + positionAttrs.y + ")" : null}
+    >{label+percent}</Text>
   );
 }
 

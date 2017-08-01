@@ -175,7 +175,7 @@ class Brush extends Component {
 
   handleLeaveSlideOrTraveller = () => {
     this.setState({
-      isTextActive: false,
+      isTextActive: true,
     });
   };
 

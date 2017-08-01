@@ -382,7 +382,7 @@ export default class Demo extends Component {
 
         <p>A simple LineChart with fixed domain y-axis</p>
         <div className='line-chart-wrapper'>
-          <LineChart width={400} height={400} data={data02} syncId="test">
+          <LineChart width={100} height={400} data={data02} syncId="test">
             <CartesianGrid stroke='#f5f5f5' fill="#e6e6e6" />
             <Legend
               onMouseEnter={this.handleLegendMouseEnter}
@@ -516,7 +516,7 @@ export default class Demo extends Component {
         <p>LineChart with panoramic brush</p>
         <div className="line-chart-wrapper">
           <LineChart
-            width={600} height={400} data={data03}
+            width={300} height={400} data={data03}
             margin={{ top: 40, right: 40, bottom: 20, left: 20 }}
           >
             <CartesianGrid vertical={false} />

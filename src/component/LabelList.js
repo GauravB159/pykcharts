@@ -18,10 +18,8 @@ const defaultProps = {
 };
 
 function LabelList(props) {
-  const { data, valueAccessor, dataKey, clockWise, ...others } = props;
-
+  const { data, valueAccessor, dataKey, clockWise, horizontal,perc,...others } = props;
   if (!data || !data.length) { return null; }
-
   return (
     <Layer className="recharts-label-list">
       {
@@ -29,13 +27,15 @@ function LabelList(props) {
           const value = _.isNil(dataKey) ?
             valueAccessor(entry, index) :
             getValueByDataKey(entry && entry.payload, dataKey);
-
           return (
             <Label
               {...getPresentationAttributes(entry)}
               {...others}
               index={index}
+              perc = {perc}
+              dataKey={dataKey}
               value={value}
+              horizontal={horizontal}
               viewBox={Label.parseViewBox(_.isNil(clockWise) ? entry : { ...entry, clockWise })}
               key={`label-${index}`}
             />
@@ -49,21 +49,18 @@ function LabelList(props) {
 LabelList.propTypes = propTypes;
 LabelList.displayName = 'LabelList';
 
-const parseLabelList = (label, data) => {
+const parseLabelList = (label, data,key) => {
   if (!label) { return null; }
 
   if (label === true) {
     return <LabelList key="labelList-implicit" data={data} />;
   }
-
   if (React.isValidElement(label) || _.isFunction(label)) {
-    return <LabelList key="labelList-implicit" data={data} content={label} />;
+    return <LabelList key="labelList-implicit" data={data} content={label} dataKey={key} />;
   }
-
   if (_.isObject(label)) {
     return <LabelList data={data} {...label} key="labelList-implicit" />;
   }
-
   return null;
 };
 
@@ -81,8 +78,7 @@ const renderCallByParent = (parentProps, data, ckeckPropsLabel = true) => {
   );
   if (!ckeckPropsLabel) { return explicitChilren; }
 
-  const implicitLabelList = parseLabelList(parentProps.label, data);
-
+  const implicitLabelList = parseLabelList(parentProps.label, data,parentProps.dataKey);
   return [implicitLabelList, ...explicitChilren];
 };
 

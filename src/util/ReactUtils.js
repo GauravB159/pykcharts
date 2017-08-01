@@ -162,17 +162,16 @@ export const findAllByType = (children, type) => {
 
   if (_.isArray(type)) {
     types = type.map(t => getDisplayName(t));
+
   } else {
     types = [getDisplayName(type)];
   }
-
   React.Children.forEach(children, (child) => {
     const childType = child && child.type && (child.type.displayName || child.type.name);
     if (types.indexOf(childType) !== -1) {
       result.push(child);
     }
   });
-
   return result;
 };
 /*
@@ -256,9 +255,9 @@ export const filterEventAttributes = (el, newHandler) => {
   return out;
 };
 
-const getEventHandler = (originalHandler, data, index) => (
+const getEventHandler = (originalHandler, data, index,key) => (
   (e) => {
-    originalHandler(data, index, e);
+    originalHandler(data, index,key, e);
 
     return null;
   }
@@ -272,7 +271,7 @@ export const filterEventsOfChild = (props, data, index) => {
   for (const i in props) {
     if ({}.hasOwnProperty.call(props, i) && EVENT_ATTRIBUTES[i] && _.isFunction(props[i])) {
       if (!out) out = {};
-      out[i] = getEventHandler(props[i], data, index);
+      out[i] = getEventHandler(props[i], data, index,props["dataKey"]);
     }
   }
   return out;
@@ -381,7 +380,6 @@ export const isChildrenEqual = (nextChildren, prevChildren) => {
 export const renderByOrder = (children, renderMap) => {
   let elements = [];
   const record = {};
-
   Children.forEach(children, (child, index) => {
     if (child && isSvgElement(child)) {
       elements.push(child);

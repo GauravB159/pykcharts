@@ -62,7 +62,7 @@ class CartesianAxis extends Component {
     orientation: 'bottom',
     // The ticks
     ticks: [],
-
+    keys:false,
     stroke: '#666',
     tickLine: true,
     axisLine: true,
@@ -72,13 +72,14 @@ class CartesianAxis extends Component {
     minTickGap: 5,
     // The width or height of tick
     tickSize: 6,
-    interval: 'preserveEnd',
+    interval: 'preserveEnd',//Preserve the last tick instead of clipping it
   };
 
+  //Get the ticks for the current axis
   static getTicks(props) {
     const { ticks, viewBox, minTickGap, orientation, interval, tickFormatter } = props;
 
-    if (!ticks || !ticks.length) { return []; }
+    if (!ticks || !ticks.length) { return []; }//No ticks
 
     if (isNumber(interval) || isSsr()) {
       return CartesianAxis.getNumberIntervalTicks(ticks, isNumber(interval) ? interval : 0);
@@ -110,7 +111,7 @@ class CartesianAxis extends Component {
 
     let start, end;
 
-    if (sign === 1) {
+    if (sign === 1) {//Positive ticks,going from x to x+width
       start = sizeKey === 'width' ? x : y;
       end = sizeKey === 'width' ? x + width : y + height;
     } else {
@@ -121,9 +122,9 @@ class CartesianAxis extends Component {
     if (preserveEnd) {
       // Try to guarantee the tail to be displayed
       let tail = ticks[len - 1];
-      const tailContent = _.isFunction(tickFormatter) ? tickFormatter(tail.value) : tail.value;
+      const tailContent = _.isFunction(tickFormatter) ? tickFormatter(tail.value) : tail.value;//If formatter is specified, use formatter
       const tailSize = getStringSize(tailContent)[sizeKey];
-      const tailGap = sign * (tail.coordinate + sign * tailSize / 2 - end);
+      const tailGap = sign * (tail.coordinate + sign * tailSize / 2 - end);//Alter gap so last element also fits
       result[len - 1] = tail = {
         ...tail,
         tickCoord: tailGap > 0 ? tail.coordinate - tailGap * sign : tail.coordinate,
@@ -223,6 +224,7 @@ class CartesianAxis extends Component {
    * @param  {Object} data The data of a simple tick
    * @return {Object} (x1, y1): The coordinate of endpoint close to tick text
    *  (x2, y2): The coordinate of endpoint close to axis
+   *  (tx,ty): Coordinates of the tick
    */
   getTickLineCoord(data) {
     const { x, y, width, height, orientation, tickSize, mirror } = this.props;
@@ -334,7 +336,6 @@ class CartesianAxis extends Component {
 
   renderTickItem(option, props, value) {
     let tickItem;
-
     if (React.isValidElement(option)) {
       tickItem = React.cloneElement(option, props);
     } else if (_.isFunction(option)) {
@@ -359,8 +360,15 @@ class CartesianAxis extends Component {
    * @return {ReactComponent} renderedTicks
    */
   renderTicks(ticks) {
-    const { tickLine, stroke, tick, tickFormatter } = this.props;
-    const finalTicks = CartesianAxis.getTicks({ ...this.props, ticks });
+    const { tickLine, stroke, tick, tickFormatter, keys, data} = this.props;
+    const finalTicks = keys === false ? CartesianAxis.getTicks({ ...this.props, ticks }) : [];
+    if(keys){
+      console.log(data);
+      Object.keys(data[0]).forEach((key)=>{
+        if(key === "name")
+        finalTicks.push(key);
+      })
+    }
     const textAnchor = this.getTickTextAnchor();
     const verticalAnchor = this.getTickVerticalAnchor();
     const axisProps = getPresentationAttributes(this.props);
@@ -379,7 +387,6 @@ class CartesianAxis extends Component {
         ...tickCoord,
         index: i, payload: entry,
       };
-
       return (
         <Layer
           className="recharts-cartesian-axis-tick"
@@ -410,10 +417,9 @@ class CartesianAxis extends Component {
   }
 
   render() {
-    const { axisLine, width, height, ticksGenerator, className } = this.props;
+    const { axisLine, width, height, ticksGenerator, className, hide } = this.props;
     const { ticks, ...noTicksProps } = this.props;
     let finalTicks = ticks;
-
     if (_.isFunction(ticksGenerator)) {
       finalTicks = (ticks && ticks.length > 0) ? ticksGenerator(this.props) :
         ticksGenerator(noTicksProps);
@@ -422,14 +428,15 @@ class CartesianAxis extends Component {
     if (width <= 0 || height <= 0 || !finalTicks || !finalTicks.length) {
       return null;
     }
-
-    return (
+    let returnVal = hide ? null : 
+    (
       <Layer className={classNames('recharts-cartesian-axis', className)}>
         {axisLine && this.renderAxisLine()}
         {this.renderTicks(finalTicks)}
         {Label.renderCallByParent(this.props)}
       </Layer>
     );
+    return returnVal;
   }
 }
 
